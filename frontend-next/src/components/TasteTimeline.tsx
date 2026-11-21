@@ -86,7 +86,6 @@ export default function TasteTimeline() {
   const timelineOpacity = useTransform(progress, [0.7, 0.96], [0, 1]);
   const portalOpacity = useTransform(progress, [0.14, 0.27, 0.8, 0.92], [0, 1, 1, 0]);
   const sourceOpacity = useTransform(progress, [0.22, 0.34, 0.43, 0.5], [0, 1, 1, 0]);
-  const hintOpacity = useTransform(progress, [0, 0.08], [1, 0]);
   const cardsOpacity = useTransform(progress, [0.95, 0.98], [0, 1]);
   const ready = journeys.length === BEATS.length;
 
@@ -225,7 +224,7 @@ export default function TasteTimeline() {
         <div className={styles.flyingLayer} aria-hidden="true">
           {!reduceMotion && journeys.map((journey, index) => <FlyingThumbnail key={BEATS[index]} index={index} journey={journey} progress={progress} />)}
         </div>
-        <motion.div className={styles.scrollHint} aria-hidden="true" style={{ opacity: hintOpacity }}>Scroll to see it take shape <ArrowDown size={13} /></motion.div>
+        <div className={styles.scrollHint}>Scroll <ArrowDown size={13} aria-hidden="true" /></div>
       </div>
     </section>
   );

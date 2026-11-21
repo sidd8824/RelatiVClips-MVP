@@ -156,7 +156,7 @@
 .sparks { left: 50%; top: 49%; z-index: 4; }
 .sparks i { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #a2e7ff; box-shadow: 0 0 10px #83aaff; }
 .sparks i:nth-child(3n) { background: #ff71ad; box-shadow: 0 0 10px #ff65a6; }
-.scrollHint { position: absolute; bottom: max(12%, 92px); inset-inline: 0; display: flex; justify-content: center; align-items: center; gap: 10px; color: #8a8a92; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+.scrollHint { position: absolute; z-index: 5; pointer-events: none; bottom: max(12%, 92px); inset-inline: 0; display: flex; justify-content: center; align-items: center; gap: 10px; color: #8a8a92; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
 
 @media (max-width: 640px) {
   .headline { width: calc(100% - 32px); font-size: clamp(28px, 7.6vw, 42px); }

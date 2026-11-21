@@ -1,6 +1,6 @@
 .stage {
   display: flex;
-  min-height: 70vh;
+  min-height: clamp(14rem, 34svh, 22rem);
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -28,7 +28,7 @@
 .floor {
   width: min(46vw, 620px);
   height: 1px;
-  margin-top: 2.6rem;
+  margin-top: clamp(1.25rem, 3vw, 2rem);
   background: linear-gradient(90deg, transparent, rgb(255 255 255 / 85%), transparent);
 }
 

@@ -43,7 +43,7 @@ export default function OwnYourTaste() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const wordTiming = { duration: DURATION, fill: "backwards" } as const;
     let running: Animation[] = [];
-    let visible = false;
+    let hasPlayed = false;
 
     function stop() {
       running.forEach((animation) => animation.cancel());
@@ -52,11 +52,10 @@ export default function OwnYourTaste() {
 
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry) return;
-      const entering = entry.isIntersecting && !visible;
-      visible = entry.isIntersecting;
-      if (!entering) return;
+      if (!entry.isIntersecting || hasPlayed) return;
 
-      stop();
+      hasPlayed = true;
+      observer.unobserve(section);
       if (reducedMotion.matches) return;
 
       running = [

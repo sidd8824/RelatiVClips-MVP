@@ -41,7 +41,7 @@ export default function OwnYourTaste() {
     if (!left || !middle || !right) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const wordTiming = { duration: DURATION, fill: "both" } as const;
+    const wordTiming = { duration: DURATION, fill: "backwards" } as const;
     let running: Animation[] = [];
     let visible = false;
 

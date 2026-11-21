@@ -37,7 +37,7 @@ const STEPS = [
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen w-full overflow-x-clip bg-[#F7F8FA] dark:bg-[#050507] text-[#111318] dark:text-white selection:bg-amber-400 selection:text-black">
+    <div className="relative min-h-screen w-full overflow-x-clip [--homepage-hero-surface:#050507] bg-[#F7F8FA] dark:bg-[#050507] text-[#111318] dark:text-white selection:bg-amber-400 selection:text-black">
       {/* ── Unobtrusive Floating Bottom Conversion Dock ── */}
       <StickyInputBar />
 

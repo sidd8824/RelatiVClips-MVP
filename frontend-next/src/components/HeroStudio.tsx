@@ -86,9 +86,9 @@ export default function HeroStudio() {
         id="homepage-hero"
         data-section-name="hero-message"
         aria-label="Hero message"
-        className={`${styles.entry} relative flex min-h-[calc(100svh-4rem)] w-full items-center justify-center overflow-hidden bg-[#050507] px-5 py-20 text-white sm:px-8`}
+        className={`${styles.entry} relative flex min-h-[calc(100svh-4rem)] w-full items-center justify-center overflow-hidden px-5 py-20 text-white sm:px-8`}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(45,38,62,0.22),transparent_58%)]" />
+        <div className={styles.ambient} aria-hidden="true" />
         <div className={styles.wheel} aria-hidden="true">
           {WHEEL_PHOTOS.map((photo, index) => (
             <Image

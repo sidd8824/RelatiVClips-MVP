@@ -7,12 +7,11 @@ import {
   UploadCloud,
   ArrowRight,
   Link2,
-  Film,
   Sparkles,
-  CheckCircle2,
 } from "lucide-react";
 import { uploadVideoFile } from "@/lib/api";
 import SickLoadingTransition from "./SickLoadingTransition";
+
 import { ImageGallery, type GalleryImage } from "@/components/dimaac/image-gallery";
 
 const images: GalleryImage[] = [
@@ -27,6 +26,9 @@ const images: GalleryImage[] = [
   { src: "https://ui.dimaac.com/media/portraits/platinum-blonde-4x5.jpg", alt: "Young man with platinum blonde hair in a yellow jacket" },
   { src: "https://ui.dimaac.com/media/fashion/orange-ring-4x5.jpg", alt: "Young man framed through an orange circle" },
 ];
+
+const ACTION_BUTTON =
+  "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl border px-3.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dad0ff] motion-safe:transition-[transform,background-color,border-color] motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0";
 
 const ROTATING_PHRASES = [
   "Tasteful Clips",
@@ -52,13 +54,17 @@ export default function HeroStudio() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!url.trim()) return;
+    if (isSubmitting) return;
+    if (!url.trim()) {
+      setError("Paste a video link or upload a file.");
+      return;
+    }
+    setError(null);
     setIsSubmitting(true);
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleUpload = async (file: File) => {
+    setUrl("");
     setIsSubmitting(true);
     setError(null);
     try {
@@ -136,7 +142,7 @@ export default function HeroStudio() {
           Paste a link or drop a raw take, and RelatiV clips, edits, sizes and publishes them to all social platforms in one click.
         </motion.p>
 
-        {/* ── Centered Input Bar (OpusClip exact match) ── */}
+        {/* Video source and actions */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -145,52 +151,90 @@ export default function HeroStudio() {
         >
           <form
             onSubmit={handleSubmit}
-            className="flex items-center rounded-full border border-white/20 bg-black/60 p-1.5 backdrop-blur-xl shadow-2xl focus-within:border-white/40 transition"
+            onDragOver={(event) => {
+              if (event.dataTransfer.types.includes("Files")) event.preventDefault();
+            }}
+            onDrop={(event) => {
+              const file = event.dataTransfer.files[0];
+              if (!file) return;
+              event.preventDefault();
+              if (isSubmitting) return;
+              if (file.type && !file.type.startsWith("video/")) {
+                setError("Choose a video file.");
+                return;
+              }
+              void handleUpload(file);
+            }}
+            className="rounded-[28px] border border-transparent p-3.5 text-left sm:p-5"
+            style={{
+              background:
+                "radial-gradient(ellipse 68% 50px at 50% 0, #dad0ff1c, transparent) padding-box, " +
+                "linear-gradient(#18151f, #18151f) padding-box, " +
+                "radial-gradient(ellipse 68% 36px at 50% 0, #9688b2, #393448) border-box",
+            }}
           >
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="pl-3 pr-2 text-zinc-400 hover:text-white cursor-pointer transition shrink-0"
-              title="Upload video file"
-            >
-              <Link2 className="w-4 h-4" />
+            <label htmlFor="hero-video-source" className="mb-2 block text-sm font-semibold">
+              Video source
+            </label>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex min-h-11 min-w-0 flex-[1_1_13rem] items-center gap-2.5 rounded-2xl border border-[#393448] bg-[#100e16] px-3 hover:border-[#73678d] focus-within:outline-2 focus-within:outline-[#dad0ff] motion-safe:transition-colors motion-safe:duration-150">
+                <Link2 aria-hidden="true" className="size-4 shrink-0 text-[#b4aec4]" />
+                <input
+                  id="hero-video-source"
+                  type="text"
+                  inputMode="url"
+                  readOnly={isSubmitting}
+                  value={url}
+                  onChange={(event) => setUrl(event.target.value)}
+                  placeholder="Paste a video link"
+                  className="h-11 min-w-0 flex-1 border-0 bg-transparent text-base text-white placeholder:text-[#b4aec4] focus:outline-none sm:text-sm"
+                />
+              </div>
+
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => fileInputRef.current?.click()}
+                className={`${ACTION_BUTTON} border-[#393448] bg-[#100e16] text-white hover:border-[#73678d] hover:bg-[#242031] disabled:cursor-wait disabled:opacity-60`}
+              >
+                <UploadCloud aria-hidden="true" className="size-4" />
+                Upload file
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  event.currentTarget.value = "";
+                  if (file && !isSubmitting) void handleUpload(file);
+                }}
+                hidden
+              />
             </div>
 
-            <input
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Drop a video link or upload a file"
-              className="w-full bg-transparent text-xs sm:text-sm text-white placeholder-zinc-500 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ring-0 border-0 py-1.5"
-              style={{ outline: "none", boxShadow: "none" }}
-            />
+            <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard")}
+                className={`${ACTION_BUTTON} border-[#393448] bg-[#100e16] text-white hover:border-[#73678d] hover:bg-[#242031]`}
+              >
+                <Sparkles aria-hidden="true" className="size-4" />
+                Auto-edit
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`${ACTION_BUTTON} border-transparent bg-[#dad0ff] font-semibold text-[#181126] hover:bg-[#e2d9ff] disabled:cursor-wait disabled:opacity-60`}
+              >
+                Get free clips
+                <ArrowRight aria-hidden="true" className="size-4" />
+              </button>
+            </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="video/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-full bg-white text-black hover:bg-zinc-200 text-xs font-bold transition shrink-0 cursor-pointer shadow-sm"
-            >
-              Get free clips
-            </button>
-
-            <span className="text-zinc-500 text-xs px-2 shrink-0">or</span>
-
-            <button
-              type="button"
-              onClick={() => router.push("/dashboard")}
-              className="text-xs text-zinc-300 hover:text-white font-medium pr-3 shrink-0 transition cursor-pointer"
-            >
-              Auto-edit
-            </button>
+            {error && <p role="alert" className="mt-3 text-sm text-rose-300">{error}</p>}
           </form>
-
-          {error && <p className="text-xs text-rose-400 mt-2">{error}</p>}
         </motion.div>
       </div>
 

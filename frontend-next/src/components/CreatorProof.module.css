@@ -3,11 +3,12 @@
   --line: rgb(255 255 255 / 8%);
   --muted: #8b8d99;
   --mono: var(--font-geist-mono), ui-monospace, monospace;
-  background: #050507;
+  position: relative;
+  background: linear-gradient(#000, #050507 7rem);
   color: #f3f4f8;
-  border-block: 1px solid var(--line);
+  border-block-end: 1px solid var(--line);
 }
-.content { max-width: 1180px; margin-inline: auto; padding: 4rem 1.25rem 6rem; }
+.content { max-width: 1180px; margin-inline: auto; padding: clamp(1.75rem, 4vw, 2.75rem) 1.25rem 6rem; }
 .title { margin: 0 0 .8rem; text-align: center; font: 800 clamp(2rem, 5vw, 3.4rem)/1.1 var(--font-body); letter-spacing: -.02em; }
 .title em {
   font-style: normal;

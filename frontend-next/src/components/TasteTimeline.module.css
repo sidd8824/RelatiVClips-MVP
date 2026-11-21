@@ -158,6 +158,11 @@
 .sparks i:nth-child(3n) { background: #ff71ad; box-shadow: 0 0 10px #ff65a6; }
 .scrollHint { position: absolute; z-index: 5; pointer-events: none; bottom: max(12%, 92px); inset-inline: 0; display: flex; justify-content: center; align-items: center; gap: 10px; color: #8a8a92; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
 
+@media (min-width: 641px) and (prefers-reduced-motion: no-preference) {
+  /* Trim space below the centered timeline after its scroll sequence. */
+  .section { margin-block-end: calc(-1 * clamp(0px, 50svh - 14rem, 9rem)); }
+}
+
 @media (max-width: 640px) {
   .headline { top: 40%; width: calc(100% - 32px); font-size: clamp(28px, 7.6vw, 42px); }
   .timeline { padding: 12px; }
@@ -170,7 +175,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .section { height: auto; padding: 40px 0 80px; }
+  .section { height: auto; padding: 40px 0 32px; }
   .stage { position: relative; height: auto; display: flex; flex-direction: column; align-items: center; gap: 48px; overflow: visible; }
   .headline, .timeline { position: relative; top: auto; left: auto; transform: none; opacity: 1 !important; }
   .inlineImage, .target { opacity: 1 !important; }

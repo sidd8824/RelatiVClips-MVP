@@ -1,105 +1,105 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef } from "react";
 import styles from "./OwnYourTaste.module.css";
 
-const PARTS = [
-  [
-    ["O", -8, 21, -0.09],
-    ["w", 14, -35, 0.13],
-    ["n", -26, 58, -0.19, 0.68],
-  ],
-  [
-    ["Y", 27, -58, 0.19, 0.68],
-    ["o", -17, 39, -0.14],
-    ["u", 13, -32, 0.12],
-    ["r", -9, 27, -0.08],
-    [" "],
-    ["T", 9, -25, 0.08],
-    ["a", -8, 21, -0.07],
-    ["s", 8, -19, 0.07],
-    ["t", -6, 16, -0.05],
-    ["e", 5, -12, 0.04],
-  ],
-] as const;
+const DURATION = 1100;
+const IMPACT = 0.55;
+const IMPACT_DELAY = DURATION * IMPACT;
+const SWING_EASING = "cubic-bezier(.55,0,.9,.6)";
+const RISE_EASING = "cubic-bezier(.2,.8,.3,1)";
+
+function sideKeyframes(direction: -1 | 1): Keyframe[] {
+  return [
+    {
+      transform: `translateX(${direction * 120}vw) skewX(${direction * -24}deg)`,
+      opacity: 0,
+      offset: 0,
+      easing: SWING_EASING,
+    },
+    { transform: "translateX(0) skewX(0)", opacity: 1, offset: IMPACT },
+    { transform: `scale(0.78, 1.14) skewX(${direction * 5}deg)`, offset: 0.70 },
+    { transform: "scale(1.06, 0.97)", offset: 0.78 },
+    { transform: "scale(1, 1)", offset: 1 },
+  ];
+}
 
 export default function OwnYourTaste() {
   const sectionRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const floorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
+    const title = titleRef.current;
+    const floor = floorRef.current;
+    if (!section || !title || !floor) return;
+
+    const left = title.querySelector<HTMLElement>('[data-word="left"]');
+    const middle = title.querySelector<HTMLElement>('[data-word="middle"]');
+    const right = title.querySelector<HTMLElement>('[data-word="right"]');
+    if (!left || !middle || !right) return;
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!section || reducedMotion.matches) return;
-
-    const initial = section.getBoundingClientRect();
-    if (initial.top + initial.height / 2 <= window.innerHeight * 0.56) return;
-
-    section.dataset.reveal = "waiting";
-    let frame = 0;
+    const wordTiming = { duration: DURATION, fill: "both" } as const;
+    let running: Animation[] = [];
+    let visible = false;
 
     function stop() {
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      cancelAnimationFrame(frame);
+      running.forEach((animation) => animation.cancel());
+      running = [];
     }
 
-    function checkPosition() {
-      frame = 0;
-      if (!section) return;
-      const { top, height, bottom } = section.getBoundingClientRect();
-      if (top + height / 2 > window.innerHeight * 0.56) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry) return;
+      const entering = entry.isIntersecting && !visible;
+      visible = entry.isIntersecting;
+      if (!entering) return;
 
       stop();
-      if (bottom > 0 && !reducedMotion.matches) {
-        section.dataset.reveal = "playing";
-      } else {
-        delete section.dataset.reveal;
-      }
-    }
+      if (reducedMotion.matches) return;
 
-    function schedule() {
-      if (!frame) frame = requestAnimationFrame(checkPosition);
-    }
+      running = [
+        left.animate(sideKeyframes(-1), wordTiming),
+        right.animate(sideKeyframes(1), wordTiming),
+        middle.animate([
+          { transform: "translateY(140px) scale(0.5)", opacity: 0, offset: 0, easing: RISE_EASING },
+          { transform: "translateY(0) scale(1)", opacity: 1, offset: 0.5 },
+          { transform: "scale(1, 1)", offset: IMPACT },
+          { transform: "scale(0.82, 1.16)", offset: 0.70 },
+          { transform: "scale(1.05, 0.96)", offset: 0.78 },
+          { transform: "scale(1, 1)", offset: 1 },
+        ], wordTiming),
+        floor.animate([
+          { transform: "scaleX(0)", opacity: 0 },
+          { transform: "scaleX(1)", opacity: 1 },
+        ], { duration: 500, delay: IMPACT_DELAY, easing: RISE_EASING, fill: "both" }),
+        title.animate([
+          { filter: "brightness(1)" },
+          { filter: "brightness(1.7)" },
+          { filter: "brightness(1)" },
+        ], { duration: 260, delay: IMPACT_DELAY }),
+      ];
+    }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
 
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    schedule();
+    observer.observe(section);
+    reducedMotion.addEventListener("change", stop);
 
     return () => {
+      observer.disconnect();
+      reducedMotion.removeEventListener("change", stop);
       stop();
-      delete section.dataset.reveal;
     };
   }, []);
 
   return (
-    <section ref={sectionRef} className={styles.section} aria-labelledby="own-your-taste-title">
-      <h2 id="own-your-taste-title" className={styles.heading} aria-label="Own Your Taste">
-        {PARTS.map((part, partIndex) => (
-          <span
-            key={partIndex}
-            className={partIndex === 0 ? styles.left : styles.right}
-            aria-hidden="true"
-          >
-            {part.map(([letter, bend, fold, lift, pinch], index) =>
-              letter === " " ? " " : (
-                <span
-                  key={index}
-                  className={styles.glyph}
-                  data-letter={letter}
-                  style={{
-                    "--bend": `${bend}deg`,
-                    "--fold": `${fold}deg`,
-                    "--lift": `${lift}em`,
-                    "--pinch": pinch ?? 0.85,
-                  } as CSSProperties}
-                >
-                  {letter}
-                </span>
-              ),
-            )}
-          </span>
-        ))}
+    <section ref={sectionRef} className={styles.stage} aria-labelledby="own-your-taste-title">
+      <h2 ref={titleRef} id="own-your-taste-title" className={styles.title}>
+        <span className={styles.word} data-word="left" data-text="Own">Own</span>{" "}
+        <span className={styles.word} data-word="middle" data-text="Your">Your</span>{" "}
+        <span className={styles.word} data-word="right" data-text="Taste">Taste</span>
       </h2>
+      <div ref={floorRef} className={styles.floor} aria-hidden="true" />
     </section>
   );
 }

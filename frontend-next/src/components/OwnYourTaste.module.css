@@ -1,158 +1,79 @@
-.section {
-  position: relative;
-  display: grid;
-  min-height: 280px;
-  place-items: center;
-  padding: 24px 16px;
-  overflow: hidden;
-  isolation: isolate;
-  background: #050507;
+.stage {
+  display: flex;
+  min-height: 70vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-x: clip;
+  background: radial-gradient(ellipse 60% 40% at 50% 50%, rgb(120 135 155 / 14%), transparent 70%), #07080b;
 }
 
-.section::before,
-.section::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.section::before {
-  inset: 0;
-  background:
-    radial-gradient(ellipse 43% 31% at 53% 55%, rgb(167 191 212 / 17%), transparent 82%),
-    radial-gradient(ellipse 33% 49% at 36% 35%, rgb(145 151 177 / 12%), transparent 78%);
-}
-
-.section::after {
-  inset: 65% 15% 15%;
-  background: radial-gradient(ellipse at center, rgb(0 0 0 / 80%), transparent 68%);
-  filter: blur(6px);
-}
-
-.heading {
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25em 0.3em;
   margin: 0;
-  text-align: center;
-  font-family: var(--font-geist), system-ui, sans-serif;
-  font-size: clamp(1.5rem, 8.8vw, 6.25rem);
-  font-weight: 800;
-  line-height: 1.06;
-  letter-spacing: -0.067em;
-  white-space: nowrap;
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: clamp(2.8rem, 11vw, 9rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
-.heading::after {
-  content: "";
-  display: block;
-  width: min(78%, 240px);
+.floor {
+  width: min(46vw, 620px);
   height: 1px;
-  margin: 22px auto 0;
-  background: linear-gradient(90deg, transparent, rgb(217 232 248 / 48%), transparent);
+  margin-top: 2.6rem;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 85%), transparent);
 }
 
-.left,
-.right {
-  display: inline-block;
-  filter: drop-shadow(2px 9px 7px rgb(0 0 0 / 60%));
-}
-
-.left {
-  --start: -42vw;
-  --press: 0.065em;
-  --lean: -3deg;
-  margin-inline-end: 0.19em;
-  transform-origin: right center;
-}
-
-.right {
-  --start: 42vw;
-  --press: -0.065em;
-  --lean: 3deg;
-  transform-origin: left center;
-}
-
-.glyph {
+.word {
   position: relative;
-  display: inline-block;
   isolation: isolate;
-  color: rgb(232 241 249 / 23%);
-  -webkit-text-stroke: 0.8px rgb(222 236 247 / 61%);
-  text-shadow: 0 1px 3px rgb(240 248 255 / 16%);
-  transform-origin: center 65%;
+  display: inline-block;
+  color: rgb(150 166 184 / 80%);
+  -webkit-text-stroke: 0.018em rgb(255 255 255 / 90%);
+  letter-spacing: -0.03em;
 }
 
-.glyph::before,
-.glyph::after {
-  content: attr(data-letter);
+.word::before,
+.word::after {
+  content: attr(data-text);
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.glyph::before {
+.word::before {
   z-index: -1;
-  transform: translate(0.028em, 0.048em);
-  color: rgb(118 144 166 / 24%);
-  -webkit-text-stroke: 0.75px rgb(164 185 205 / 37%);
-  text-shadow: 0.014em 0.026em rgb(105 123 145 / 38%), 0.025em 0.049em rgb(66 82 105 / 40%);
+  color: #5a6b83;
+  -webkit-text-stroke: 0.018em rgb(255 255 255 / 45%);
+  transform: translate(0.03em, 0.035em);
+  text-shadow:
+    0.012em 0.012em 0 #52627a,
+    0.024em 0.024em 0 #4d5d74,
+    0.036em 0.036em 0 #48576d,
+    0.048em 0.048em 0 #435167,
+    0 0.08em 0.12em rgb(0 0 0 / 60%),
+    0 0 0.5em rgb(150 170 200 / 18%);
 }
 
-.glyph::after {
+.word::after {
+  -webkit-text-stroke: 0;
+  background: linear-gradient(
+    115deg,
+    rgb(255 255 255 / 55%) 0%,
+    rgb(255 255 255 / 14%) 38%,
+    transparent 39%,
+    rgb(255 255 255 / 16%) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 1px rgb(251 253 255 / 86%);
-  text-shadow: 0 -1px 6px rgb(235 247 255 / 33%);
-  clip-path: polygon(0 0, 100% 0, 100% 29%, 0 53%);
 }
 
-@media (width < 640px) {
-  .section { min-height: 202px; }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .section[data-reveal="waiting"] .heading { opacity: 0; }
-
-  .section[data-reveal="playing"] :is(.left, .right) {
-    animation: impact 540ms linear both;
-  }
-
-  .section[data-reveal="playing"] .glyph {
-    animation: crumple 540ms linear both;
-  }
-
-  .section[data-reveal="playing"] .heading::after {
-    animation: reveal-line 155ms ease-out 355ms both;
-  }
-}
-
-@keyframes impact {
-  0% {
-    opacity: 0;
-    transform: translateX(var(--start)) rotate(var(--lean));
-    animation-timing-function: cubic-bezier(0.56, 0.02, 0.84, 0.65);
-  }
-  24% { opacity: 1; }
-  70% {
-    transform: translateX(0) rotate(0);
-    animation-timing-function: ease-out;
-  }
-  81% {
-    transform: translateX(var(--press)) scale(0.89, 0.94);
-    animation-timing-function: ease-out;
-  }
-  95%, 100% { transform: translateX(0) scale(1); }
-}
-
-@keyframes crumple {
-  0%, 70% { transform: none; }
-  82% {
-    transform: perspective(6em) translateY(var(--lift)) rotate(var(--bend)) rotateX(var(--fold)) scaleX(var(--pinch));
-    filter: brightness(1.22);
-    animation-timing-function: cubic-bezier(0.16, 0.77, 0.33, 1);
-  }
-  95%, 100% { transform: none; }
-}
-
-@keyframes reveal-line {
-  from { opacity: 0; transform: scaleX(0.3); }
-  to { opacity: 1; transform: scaleX(1); }
-}
+.word[data-word="left"] { transform-origin: right center; }
+.word[data-word="middle"] { transform-origin: center bottom; }
+.word[data-word="right"] { transform-origin: left center; }
